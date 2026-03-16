@@ -172,6 +172,11 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 | 2026-03-16 | UI layout: icon sidebar + collapsible side panel + 3D viewer + collapsible AI chat |
 | 2026-03-16 | Barvy a UI vzory z BIM_checker pro budoucí integraci |
 | 2026-03-16 | Schválený mockup: viz .superpowers/brainstorm/ |
+| 2026-03-16 | Three.js verze 0.175.0 (vyžadováno @thatopen/components 3.3.2) |
+| 2026-03-16 | esm.sh CDN funguje na RPi — ověřeno (Three.js + OBC import OK) |
+| 2026-03-16 | IFC parser se NEPOUŽÍVÁ vlastní — IfcLoader z @thatopen zvládne vše |
+| 2026-03-16 | Žádný Cloudflare deploy — vše běží lokálně |
+| 2026-03-16 | Port 8080 obsazen Pi Files — dev server na portu 8090 |
 
 ---
 
