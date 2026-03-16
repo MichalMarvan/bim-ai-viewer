@@ -1,6 +1,7 @@
 /**
  * Toast notification system
  */
+import { escapeHtml } from '../core/utils.js';
 
 export function showToast(message, type = 'info', duration = 3000) {
   let container = document.getElementById('toastContainer');
@@ -13,7 +14,7 @@ export function showToast(message, type = 'info', duration = 3000) {
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   toast.style.pointerEvents = 'auto';
-  toast.innerHTML = `<span>${message}</span><button class="toast-close">&times;</button>`;
+  toast.innerHTML = `<span>${escapeHtml(message)}</span><button class="toast-close">&times;</button>`;
   toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
   container.appendChild(toast);
   setTimeout(() => { if (toast.parentElement) toast.remove(); }, duration);

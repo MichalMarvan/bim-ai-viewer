@@ -5,16 +5,16 @@ import { state } from '../core/state.js';
 import { t } from '../core/i18n.js';
 import { escapeHtml } from '../core/utils.js';
 import { showToast, showSuccess, showError } from '../ui/toast.js';
-import { showModal, showConfirm } from '../ui/modals.js';
-import { testConnection, fetchModels } from '../ai/ai-client.js';
+import { showConfirm } from '../ui/modals.js';
+import { testConnection } from '../ai/ai-client.js';
 import {
   saveEndpoint, deleteEndpoint, createAgent, createFromTemplate,
-  deleteAgent, getTemplates, loadAgents, loadEndpoints
+  deleteAgent, getTemplates
 } from '../ai/agent-manager.js';
 import { populateAgentSelect, updateAgentStatus } from './chat-ui.js';
 
 export function initSettingsUI() {
-  document.getElementById('btnAddEndpoint')?.addEventListener('click', showAddEndpointModal);
+  initInlineSettings();
   renderEndpoints();
   renderAgentsList();
 }
@@ -58,56 +58,7 @@ export function renderEndpoints() {
   });
 }
 
-async function showAddEndpointModal() {
-  const presets = [
-    { name: 'Ollama (lokální)', url: 'http://localhost:11434/v1', needsKey: false },
-    { name: 'LM Studio (lokální)', url: 'http://localhost:1234/v1', needsKey: false },
-    { name: 'OpenAI', url: 'https://api.openai.com/v1', needsKey: true },
-    { name: 'OpenRouter', url: 'https://openrouter.ai/api/v1', needsKey: true },
-    { name: 'Vlastní', url: '', needsKey: false },
-  ];
-
-  const presetsHtml = presets.map((p, i) =>
-    `<option value="${i}">${escapeHtml(p.name)}</option>`
-  ).join('');
-
-  const bodyHtml = `
-    <div class="form-group">
-      <label>${t('agents.template')}</label>
-      <select name="preset" id="epPreset">
-        ${presetsHtml}
-      </select>
-    </div>
-    <div class="form-group">
-      <label>${t('settings.name')}</label>
-      <input name="name" id="epName" value="${escapeHtml(presets[0].name)}">
-    </div>
-    <div class="form-group">
-      <label>${t('settings.url')}</label>
-      <input name="url" id="epUrl" value="${escapeHtml(presets[0].url)}">
-    </div>
-    <div class="form-group" id="epApiKeyGroup" style="display:none;">
-      <label>${t('settings.apiKey')}</label>
-      <input name="apiKey" id="epApiKey" type="password" placeholder="sk-...">
-    </div>
-    <div style="margin-top:8px;">
-      <button class="btn-modern" id="epTestBtn" type="button">${t('btn.test')}</button>
-      <span id="epTestResult" style="font-size:11px;margin-left:8px;"></span>
-    </div>
-    <div id="epModelsInfo" style="font-size:10px;color:var(--text-tertiary);margin-top:8px;"></div>
-  `;
-
-  const result = await showModal(t('settings.addEndpoint'), bodyHtml, [
-    { label: t('btn.cancel'), action: 'cancel' },
-    { label: t('btn.save'), action: 'save', class: 'primary' },
-  ]);
-
-  // Before the modal resolves, we need to set up the interactive elements
-  // This is tricky with our simple modal system — let's use a different approach
-  // The modal is already shown, so we need to attach events to it
-}
-
-// Simpler approach: inline settings directly in the panel
+// Inline settings using browser prompts (simple, reliable)
 export function initInlineSettings() {
   const addBtn = document.getElementById('btnAddEndpoint');
   addBtn?.addEventListener('click', async () => {

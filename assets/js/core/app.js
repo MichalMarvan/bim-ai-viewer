@@ -15,7 +15,7 @@ import { buildModelIndex } from '../ifc/ifc-index.js';
 import { initTreeUI, refreshTree } from '../ui/tree-ui.js';
 import { initPropertiesUI } from '../ui/properties-ui.js';
 import { initChatUI, populateAgentSelect, updateAgentStatus } from '../ui/chat-ui.js';
-import { initInlineSettings, renderEndpoints, renderAgentsList } from '../ui/settings-ui.js';
+import { initSettingsUI } from '../ui/settings-ui.js';
 import { loadAgents, loadEndpoints } from '../ai/agent-manager.js';
 
 async function init() {
@@ -64,9 +64,7 @@ async function init() {
   updateAgentStatus();
 
   // Settings UI
-  initInlineSettings();
-  renderEndpoints();
-  renderAgentsList();
+  initSettingsUI();
 
   // When IFC loaded → build index → refresh tree
   window.addEventListener('ifc-loaded', async (e) => {
