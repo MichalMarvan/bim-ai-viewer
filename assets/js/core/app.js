@@ -7,6 +7,10 @@ import { initTheme } from '../ui/theme.js';
 import { initNavigation } from '../ui/navigation.js';
 import { initPanels } from '../ui/panels.js';
 import { showToast, showError, showSuccess } from '../ui/toast.js';
+import { initViewer, updateViewerBackground } from '../viewer/viewer-init.js';
+import { initIfcLoader } from '../ifc/ifc-loader.js';
+import { initSelection } from '../viewer/viewer-selection.js';
+import { initViewerTools } from '../viewer/viewer-tools.js';
 
 async function init() {
   // Theme
@@ -36,6 +40,22 @@ async function init() {
       chatInput.style.height = Math.min(chatInput.scrollHeight, 80) + 'px';
     });
   }
+
+  // IFC file loading (works without 3D viewer)
+  initIfcLoader();
+
+  // 3D Viewer (async — loads from CDN, may take time)
+  const viewer = await initViewer();
+  if (viewer) {
+    initSelection();
+    initViewerTools();
+  }
+
+  // Theme change updates viewer background
+  const themeBtn = document.getElementById('themeToggle');
+  themeBtn?.addEventListener('click', () => {
+    setTimeout(updateViewerBackground, 50);
+  });
 
   console.log('BIM AI Viewer initialized');
 }

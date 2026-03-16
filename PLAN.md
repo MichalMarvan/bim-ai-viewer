@@ -9,33 +9,44 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 ---
 
 ## Fáze 1: Základní kostra a 3D viewer
-**Stav: 📋 Připraveno**
+**Stav: 🔄 Rozpracováno**
 
-### 1.1 Projekt setup
-- [ ] Inicializovat git repo, .gitignore, základní index.html
-- [ ] Nastavit adresářovou strukturu (assets/js/core, viewer, ifc, ai, ui, workers, css)
-- [ ] CSS základ — přenést proměnné z BIM_checker (common.css), dark/light theme
-- [ ] Základní index.html s layout strukturou (navbar, icon sidebar, side panel, viewer area, AI sidebar)
+### 1.1 Projekt setup ✅ HOTOVO (2026-03-16)
+- [x] Git repo, .gitignore, CLAUDE.md, PLAN.md
+- [x] Adresářová struktura (assets/js/core, viewer, ifc, ai, ui, workers, css)
+- [x] CSS základ — variables.css (barvy z BIM_checker) + app.css (layout z mockupu)
+- [x] index.html s kompletním layoutem (navbar, icon sidebar, side panel, viewer area, AI sidebar)
+- [x] Core moduly: utils.js, state.js, i18n.js, translations.js
+- [x] UI moduly: theme.js, toast.js, modals.js, navigation.js, panels.js
+- [x] app.js bootstrap — vše propojeno
 
-### 1.2 Integrace @thatopen/components + Three.js
-- [ ] Prozkoumat @thatopen/components API a dokumentaci
-- [ ] Rozhodnout loading strategii (CDN vs lokální bundle)
-- [ ] Základní 3D scéna — inicializace, render loop, kamera, controls
-- [ ] Načtení IFC souboru přes web-ifc → zobrazení 3D modelu
-- [ ] Výběr objektů kliknutím (raycasting), zvýraznění vybraného
-- [ ] Toolbar — výběr/orbita/měření/řez
-- [ ] Zoom controls, fit-to-view
-- [ ] Axes gizmo
-- [ ] Info bar (FPS, počet objektů, vybraný objekt)
+**Poznámky:**
+- CSS proměnné v `variables.css` (ne common.css) — jiný název než v CLAUDE.md, aktualizovat
+- Port 8080 obsazen Pi Files — používáme 8090 pro dev server
+- Screenshot ověřen — layout odpovídá mockupu
 
-### 1.3 UI kostra
-- [ ] Icon sidebar s navigací (funkční přepínání panelů)
-- [ ] Side panel — slide-in/out animace
-- [ ] AI sidebar — slide-in/out animace
-- [ ] Navbar — brand, file info, akce (načíst IFC, export), theme toggle, language switch
-- [ ] Responsive layout (tablet, mobil)
-- [ ] Drop zone pro IFC soubory (drag & drop + click)
-- [ ] Light/dark theme toggle (funkční)
+### 1.2 Integrace @thatopen/components + Three.js 🔄
+- [x] Loading strategie: esm.sh CDN s dynamickými importy (fallback pokud CDN selže)
+- [x] viewer-init.js — inicializace Components, Worlds, SimpleScene/Camera/Renderer
+- [x] ifc-loader.js — drag & drop + file picker, načtení přes IfcLoader
+- [x] viewer-selection.js — raycasting (double-click), zvýraznění materiálem
+- [x] viewer-tools.js — toolbar přepínání (select/orbit/measure/clip), zoom, fit-all
+- [x] FPS counter, info bar, axes gizmo (CSS-only)
+- [ ] **TODO: Otestovat s reálným IFC souborem** — CDN import @thatopen zatím neověřen na RPi
+
+**Poznámky:**
+- Použit dynamický import() místo import map — robustnější pro CDN
+- Highlighting zatím přes přímou manipulaci materiálu (ne Highlighter z components-front)
+- expressID přístup závisí na geometry attributes — bude potřeba doladit po runtime testu
+
+### 1.3 UI kostra ✅ HOTOVO (2026-03-16)
+- [x] Icon sidebar s navigací (7 ikon + tooltips)
+- [x] Side panel — slide-in/out s cubic-bezier animací + expand tab
+- [x] AI sidebar — slide-in/out + expand tab
+- [x] Navbar — brand, file info, Načíst IFC/Export, průvodce, nápověda, CZ/EN, theme toggle
+- [x] Responsive (tablet <=1024px, mobil <=768px s overlay panely)
+- [x] Drop zone + drag overlay
+- [x] Light/dark theme toggle (funkční, localStorage)
 
 ---
 
