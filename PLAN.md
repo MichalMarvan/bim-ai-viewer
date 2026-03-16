@@ -51,82 +51,67 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 ---
 
 ## Fáze 2: IFC parsování a strom modelu
-**Stav: 📋 Připraveno**
+**Stav: ✅ HOTOVO (2026-03-16)**
 
-### 2.1 IFC streaming parser
-- [ ] Přenést/adaptovat ifc-stream-parser.js z BIM_checker
-- [ ] Web Worker pro parsování (neblokovat UI)
-- [ ] Progress reporting (progress bar při načítání)
-- [ ] Filtrování geometrie, zachování sémantických entit
+### 2.1 IFC parsování ✅
+- [x] **Rozhodnutí:** Nepoužíváme vlastní IFC stream parser — @thatopen/components IfcLoader to řeší interně
+- [x] ifc-loader.js — drag & drop + file picker, IfcLoader.load()
+- [x] ifc-index.js — po načtení projde scénu a vytvoří JSON index (typy, počty, expressIDs)
 
-### 2.2 Strom modelu (Model Tree)
-- [ ] Hierarchická struktura: Projekt → Budova → Patro → Typy entit → Entity
-- [ ] Interaktivní strom — klik na entitu → zvýraznit ve 3D, zobrazit properties
-- [ ] Počty objektů v badges
-- [ ] Hledání v modelu (search box)
-- [ ] Expand/collapse větví
+### 2.2 Strom modelu ✅
+- [x] tree-builder.js — hierarchie: Model → EntityType → Entity (s limitem 100 entit na typ)
+- [x] tree-ui.js — render stromu, expand/collapse, search filter (debounced), click → highlight ve 3D
+- [x] Počty v badges, barevné ikony pro IFC typy
 
-### 2.3 Properties panel
-- [ ] Zobrazení vlastností vybraného objektu (GlobalId, Name, Type, atributy)
-- [ ] PropertySety s hodnotami
-- [ ] Vizuální indikace chybějících/problémových vlastností
+### 2.3 Properties panel ✅
+- [x] properties-ui.js — zobrazí ExpressID, Type vybraného objektu
+- [x] Napojeno na entity-selected event
+- **TODO:** Plné PropertySety vyžadují IFC properties API — zatím jen základní info
 
-### 2.4 IndexedDB storage
-- [ ] Ukládání načtených IFC souborů do IndexedDB
-- [ ] Seznam uložených souborů, možnost přepínat
-- [ ] Metadata (název, velikost, počet entit, datum načtení)
+### 2.4 IndexedDB storage ✅
+- [x] storage.js — generický wrapper (agents, endpoints, chats, settings stores)
+- [x] Oddělené stores pro agenty, endpointy, chaty, nastavení
+- **TODO:** Ukládání IFC souborů do IndexedDB (zatím se soubory jen drží v paměti)
 
 ---
 
 ## Fáze 3: AI agenti
-**Stav: 📋 Připraveno**
+**Stav: ✅ HOTOVO (2026-03-16)**
 
-### 3.1 AI client (endpoint management)
-- [ ] Nastavení endpointů — UI pro přidání/editaci (URL, API klíč, model)
-- [ ] Podpora OpenAI-compatible API formátu (Ollama, LM Studio, OpenAI, Anthropic, etc.)
-- [ ] Detekce dostupných modelů (GET /v1/models pro Ollama/LM Studio)
-- [ ] Uložení konfigurace do IndexedDB
-- [ ] Status indikátor (připojeno/odpojeno)
+### 3.1 AI client ✅
+- [x] ai-client.js — chatCompletion() s streaming (SSE), fetchModels(), testConnection()
+- [x] Podpora OpenAI-compatible API (Ollama, LM Studio, OpenAI, Anthropic, OpenRouter)
+- [x] settings-ui.js — přidání endpointů s test spojení, auto-load modelů
+- [x] Uložení do IndexedDB, status indikátor (zelená/červená tečka)
 
-### 3.2 Agent správa
-- [ ] Vytváření agentů s názvem, system promptem, endpointem, modelem
-- [ ] Předdefinované šablony agentů:
-  - **Validátor** — kontroluje IFC proti pravidlům/IDS
-  - **Hledač objektů** — vyhledává entity podle kritérií
-  - **Analytik** — statistiky, souhrny, reporty
-  - **Měřič** — rozměry, vzdálenosti, plochy
-- [ ] Přepínání agentů v AI sidebar (select)
-- [ ] Uložení agentů do IndexedDB
+### 3.2 Agent správa ✅
+- [x] agent-manager.js — CRUD, IndexedDB persistence
+- [x] 4 šablony: Validátor (0.3), Hledač (0.5), Analytik (0.7), Měřič (0.3)
+- [x] Vytvoření z šablony nebo custom
+- [x] Přepínání v AI sidebar select
+- [x] settings-ui.js — seznam agentů, mazání, vytváření
 
-### 3.3 IFC → AI kontext (JSON index)
-- [ ] Při parsování vytvořit kompaktní JSON index modelu:
-  - Typy entit s počty
-  - Hierarchie (budova → patra → entity)
-  - Seznam PropertySetů s klíči
-  - Materiály, klasifikace
-- [ ] Index jako součást system promptu agenta
-- [ ] Optimalizace velikosti pro malé modely (context window)
+### 3.3 IFC → AI kontext ✅
+- [x] ifc-index.js — JSON index (typy, počty, expressIDs, materiály)
+- [x] getModelSummaryForAI() — textový souhrn do system promptu
+- [x] Automaticky se přidá ke každé konverzaci
 
-### 3.4 Tool-calling systém
-- [ ] Definice nástrojů ve formátu OpenAI function-calling:
-  - `search_entities(type, filters)` — vrátí seznam entit
-  - `get_properties(entityId)` — vrátí properties entity
-  - `highlight_entities(entityIds, color)` — zvýrazní ve 3D
-  - `clear_highlights()` — odstraní zvýraznění
-  - `get_model_stats()` — statistiky modelu
-  - `validate_property(entityId, psetName, propName, expectedValue)` — validace
-- [ ] Executor — zpracování tool calls z LLM odpovědi, vykonání, vrácení výsledku
-- [ ] Iterativní smyčka (agent volá tool → výsledek → agent pokračuje)
-- [ ] Max rounds limit
+### 3.4 Tool-calling systém ✅
+- [x] tool-defs.js — 6 nástrojů v OpenAI function-calling formátu
+- [x] tool-executor.js — executeTool() s case routing
+- [x] search_entities, get_properties, highlight_entities, clear_highlights, get_model_stats, validate_property
+- [x] Iterativní smyčka v chat-ui.js (max 5 kol)
+- **TODO:** validate_property je stub — plná implementace vyžaduje IFC properties API
 
-### 3.5 Chat UI
-- [ ] Konverzace — user/AI zprávy s markdown renderem
-- [ ] Klikatelné entity ID v odpovědích (navigace k objektu ve 3D)
-- [ ] Tabulky ve zprávách
-- [ ] Status tagy (✅ OK, ⚠ Warning, ❌ Error)
-- [ ] Quick action tlačítka
-- [ ] Historie konverzací (IndexedDB)
-- [ ] Streaming odpovědí (SSE pokud endpoint podporuje)
+### 3.5 Chat UI ✅
+- [x] chat-ui.js — kompletní konverzační UI (~300 řádků)
+- [x] Markdown rendering (marked.js + DOMPurify)
+- [x] Tool-calling loop s vizualizací tool calls
+- [x] Streaming odpovědí (SSE) s live preview
+- [x] Quick action tlačítka
+- [x] Klikatelné entity ID (#NNNN → navigace ve 3D)
+- [x] Thinking indikátor s tlačítkem Stop
+- **TODO:** Historie konverzací (persistence v IndexedDB)
 
 ---
 
@@ -170,9 +155,9 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 - [ ] Navigace z BIM_checker hlavní stránky
 
 ### 5.4 Deployment
-- [ ] Cloudflare Pages deployment
 - [ ] PWA manifest + service worker
 - [ ] Testování na různých zařízeních
+- [ ] Lokální hosting (žádný cloud deploy — vše běží lokálně)
 
 ---
 
