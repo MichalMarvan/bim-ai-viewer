@@ -12,8 +12,8 @@
 ```json
 {
   "imports": {
-    "three": "https://esm.sh/three@0.168.0",
-    "three/examples/jsm/": "https://esm.sh/three@0.168.0/examples/jsm/",
+    "three": "https://esm.sh/three@0.175.0",
+    "three/examples/jsm/": "https://esm.sh/three@0.175.0/examples/jsm/",
     "@thatopen/components": "https://esm.sh/@thatopen/components@3.3.2",
     "@thatopen/components-front": "https://esm.sh/@thatopen/components-front@3.3.2",
     "@thatopen/fragments": "https://esm.sh/@thatopen/fragments@3.3.2",

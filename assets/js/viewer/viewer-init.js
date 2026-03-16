@@ -13,7 +13,8 @@ let ifcLoader = null;
 let initialized = false;
 
 // CDN URLs for import
-const THREE_CDN = 'https://esm.sh/three@0.168.0';
+// NOTE: @thatopen/components@3.3.2 requires three >= 0.175.0
+const THREE_CDN = 'https://esm.sh/three@0.175.0';
 const OBC_CDN = 'https://esm.sh/@thatopen/components@3.3.2';
 const WASM_PATH = 'https://unpkg.com/web-ifc@0.0.74/';
 const WORKER_URL = 'https://thatopen.github.io/engine_fragment/resources/worker.mjs';
@@ -62,10 +63,12 @@ export async function initViewer() {
 
     initialized = true;
 
-    // Show viewer UI elements
+    // Show viewer UI elements, hide background grid
     document.getElementById('viewerToolbar')?.style.removeProperty('display');
     document.getElementById('viewTools')?.style.removeProperty('display');
     document.getElementById('axesGizmo')?.style.removeProperty('display');
+    const grid = document.querySelector('.viewer-grid');
+    if (grid) grid.style.display = 'none';
 
     // Start FPS counter
     startFpsCounter();
