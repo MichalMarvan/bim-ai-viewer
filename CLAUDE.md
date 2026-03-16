@@ -58,8 +58,8 @@ bim-ai-viewer/
 │   │   ├── ui/                   # Panels, modals, theme, navigation
 │   │   └── workers/              # Web Workers for parsing/validation
 │   ├── css/
-│   │   ├── common.css            # Shared variables & base (from BIM_checker)
-│   │   └── app.css               # App-specific styles
+│   │   ├── variables.css         # CSS custom properties (from BIM_checker common.css)
+│   │   └── app.css               # All layout & component styles
 │   └── vendor/                   # Third-party (web-ifc WASM, etc.)
 ├── CLAUDE.md
 ├── PLAN.md
