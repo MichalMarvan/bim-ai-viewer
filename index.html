@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="cs" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIM AI Viewer</title>
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+
+  <!-- Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <a class="navbar-brand" href="#">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name" data-i18n="app.title">BIM AI Viewer</span>
+      <span class="brand-version" data-i18n="app.version">Alpha 0.1</span>
+    </div>
+  </a>
+
+  <div class="navbar-file" id="navbarFileInfo">
+    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+    <span id="navbarFileName" data-i18n="model.noFile">Žádný soubor</span>
+  </div>
+
+  <div class="navbar-spacer"></div>
+
+  <div class="navbar-actions">
+    <button class="btn-modern" id="btnLoadIfc">
+      <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <span data-i18n="btn.loadIfc">Načíst IFC</span>
+    </button>
+    <button class="btn-modern" id="btnExport">
+      <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span data-i18n="btn.export">Export</span>
+    </button>
+
+    <div class="navbar-sep"></div>
+
+    <!-- Wizard -->
+    <button class="btn-icon-modern" title="Průvodce">
+      <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </button>
+    <!-- Help -->
+    <button class="btn-icon-modern" title="Nápověda">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </button>
+
+    <!-- Language -->
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="cs">CZ</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+
+    <!-- Theme -->
+    <button class="btn-icon-modern" id="themeToggle" data-i18n-title="theme.toggle" title="Přepnout téma">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="main">
+
+  <!-- ICON SIDEBAR -->
+  <div class="icon-sidebar">
+    <div class="nav-icon active" data-nav="tree" data-i18n-title="nav.tree">
+      <svg class="icon" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.tree">Strom modelu</span>
+    </div>
+    <div class="nav-icon" data-nav="properties" data-i18n-title="nav.properties">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.properties">Vlastnosti</span>
+    </div>
+    <div class="nav-icon" data-nav="validation" data-i18n-title="nav.validation">
+      <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.validation">Validace</span>
+    </div>
+    <div class="nav-icon" data-nav="search" data-i18n-title="nav.search">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.search">Hledání objektů</span>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-icon" data-nav="agents" data-i18n-title="nav.agents">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.57-3.25 3.92L12 22l-.75-12.08A4.001 4.001 0 0 1 12 2z"/><circle cx="12" cy="6" r="1.5" fill="currentColor" stroke="none"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.agents">AI Agenti</span>
+    </div>
+    <div class="nav-icon" data-nav="standards" data-i18n-title="nav.standards">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.standards">Normy &amp; IDS</span>
+    </div>
+
+    <div class="nav-spacer"></div>
+    <div class="nav-divider"></div>
+
+    <div class="nav-icon" data-nav="settings" data-i18n-title="nav.settings">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span class="nav-tooltip" data-i18n="nav.settings">Nastavení</span>
+    </div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel" id="sidePanel">
+    <div class="panel-header">
+      <svg class="icon" viewBox="0 0 24 24" style="color:var(--primary-light)"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <h3 id="panelTitle" data-i18n="nav.tree">Strom modelu</h3>
+      <button class="panel-close">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Panel: Tree -->
+    <div class="panel-view" id="panel-tree">
+      <div class="search-wrap">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="treeSearch" data-i18n-placeholder="tree.search" placeholder="Hledat v modelu...">
+      </div>
+      <div class="tree" id="modelTree">
+        <div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:12px;" data-i18n="tree.empty">Načtěte IFC soubor</div>
+      </div>
+      <div class="props-section" id="propsSection" style="display:none;">
+        <div class="props-header" id="propsHeader">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          <span data-i18n="props.title">Vybraný objekt</span>
+        </div>
+        <div class="props-body" id="propsBody">
+          <div style="color:var(--text-tertiary);font-size:11px;" data-i18n="props.empty">Vyberte objekt kliknutím</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Properties (full) -->
+    <div class="panel-view hidden" id="panel-properties">
+      <div style="padding:16px;color:var(--text-tertiary);font-size:12px;" data-i18n="props.empty">Vyberte objekt kliknutím</div>
+    </div>
+
+    <!-- Panel: Validation -->
+    <div class="panel-view hidden" id="panel-validation">
+      <div style="padding:16px;color:var(--text-tertiary);font-size:12px;">Validace bude dostupná po načtení IDS specifikace.</div>
+    </div>
+
+    <!-- Panel: Search -->
+    <div class="panel-view hidden" id="panel-search">
+      <div class="search-wrap">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="entitySearch" placeholder="IfcWall, IfcDoor...">
+      </div>
+      <div id="searchResults" style="padding:8px;"></div>
+    </div>
+
+    <!-- Panel: Agents -->
+    <div class="panel-view hidden" id="panel-agents">
+      <div class="settings-section" id="agentsList">
+        <div style="color:var(--text-tertiary);font-size:12px;" data-i18n="agents.noAgents">Žádní agenti — vytvořte prvního</div>
+      </div>
+    </div>
+
+    <!-- Panel: Standards -->
+    <div class="panel-view hidden" id="panel-standards">
+      <div style="padding:16px;color:var(--text-tertiary);font-size:12px;">IDS specifikace — připravuje se.</div>
+    </div>
+
+    <!-- Panel: Settings -->
+    <div class="panel-view hidden" id="panel-settings">
+      <div class="settings-section" id="endpointsList">
+        <h4>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span data-i18n="settings.endpoints">LLM Endpointy</span>
+        </h4>
+        <div id="endpointsContainer"></div>
+        <button class="btn-modern" id="btnAddEndpoint" style="margin-top:8px;width:100%;">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="settings.addEndpoint">Přidat endpoint</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D VIEWER -->
+  <div class="viewer-area">
+    <div id="viewerContainer"></div>
+    <div class="viewer-grid"></div>
+
+    <!-- Drop zone (visible when no model) -->
+    <div class="drop-zone" id="dropZone">
+      <svg class="icon" viewBox="0 0 24 24" style="width:48px;height:48px;stroke-width:1.5;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <div class="drop-title" data-i18n="drop.title">Přetáhněte IFC soubor sem</div>
+      <div class="drop-subtitle" data-i18n="drop.subtitle">nebo klikněte pro výběr</div>
+      <div class="drop-format">.ifc</div>
+    </div>
+
+    <!-- Drag overlay -->
+    <div class="drag-overlay" id="dragOverlay"><span data-i18n="drop.dragging">Pusťte soubor zde</span></div>
+
+    <!-- Toolbar -->
+    <div class="viewer-toolbar" id="viewerToolbar" style="display:none;">
+      <div class="vt-group">
+        <div class="vt-item active" data-tool="select">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+          <span data-i18n="viewer.select">Výběr</span>
+        </div>
+        <div class="vt-item" data-tool="orbit">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span data-i18n="viewer.orbit">Orbita</span>
+        </div>
+        <div class="vt-item" data-tool="measure">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 3v18M19 3v18M3 12h18"/></svg>
+          <span data-i18n="viewer.measure">Měření</span>
+        </div>
+        <div class="vt-item" data-tool="clip">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="8" y1="19" x2="8" y2="21"/><line x1="16" y1="19" x2="16" y2="21"/><rect x="4" y="11" width="16" height="8" rx="1"/><path d="M4 15h16"/></svg>
+          <span data-i18n="viewer.clip">Řez</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- View controls -->
+    <div class="view-tools" id="viewTools" style="display:none;">
+      <button class="vt-btn" id="btnZoomIn" data-i18n-title="viewer.zoomIn" title="Přiblížit">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="vt-btn" id="btnZoomOut" data-i18n-title="viewer.zoomOut" title="Oddálit">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="vt-btn" id="btnFitAll" data-i18n-title="viewer.fitAll" title="Přizpůsobit vše">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      </button>
+      <button class="vt-btn" id="btnOrtho" data-i18n-title="viewer.ortho" title="Ortho pohled">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+      </button>
+    </div>
+
+    <!-- Axes gizmo -->
+    <div class="axes-gizmo" id="axesGizmo" style="display:none;">
+      <div class="line-x"></div>
+      <div class="line-y"></div>
+      <div class="line-z"></div>
+      <span class="axis ax">X</span>
+      <span class="axis ay">Y</span>
+      <span class="axis az">Z</span>
+    </div>
+
+    <!-- Info bar -->
+    <div class="info-bar">
+      <span class="info-dot green" id="infoStatusDot"></span>
+      <span id="infoStatus" data-i18n="model.noFile">Žádný soubor</span>
+      <span class="info-sep">|</span>
+      <span id="infoObjects">0 objektů</span>
+      <span class="info-sep">|</span>
+      <span id="infoFps">FPS: --</span>
+      <span class="info-sep" id="infoSelectedSep" style="display:none;">|</span>
+      <span id="infoSelected"></span>
+      <span style="margin-left:auto;" id="infoMode">--</span>
+    </div>
+  </div>
+
+  <!-- AI CHAT SIDEBAR -->
+  <div class="ai-sidebar" id="aiSidebar">
+    <div class="ai-header">
+      <div class="ai-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.57-3.25 3.92L12 22l-.75-12.08A4.001 4.001 0 0 1 12 2z"/><circle cx="12" cy="6" r="1.5" fill="white" stroke="none"/></svg>
+      </div>
+      <h3 data-i18n="ai.agent">AI Agent</h3>
+      <select class="ai-agent-select" id="agentSelect">
+        <option value="" data-i18n="ai.noAgent">Žádný agent</option>
+      </select>
+      <button class="panel-close">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="ai-status" id="aiStatus">
+      <span class="info-dot" id="aiStatusDot"></span>
+      <span id="aiStatusText" data-i18n="ai.noEndpoint">Žádný endpoint</span>
+      <span class="model-tag" id="aiModelTag"></span>
+    </div>
+
+    <div class="ai-messages" id="chatMessages">
+      <div style="text-align:center;color:var(--text-tertiary);font-size:12px;padding:40px 20px;">
+        Načtěte IFC model a vyberte agenta pro zahájení konverzace.
+      </div>
+    </div>
+
+    <div class="ai-quick" id="quickActions">
+      <button class="qa-btn" data-prompt="Dej mi statistiku modelu">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <span data-i18n="ai.quickStats">Statistika</span>
+      </button>
+      <button class="qa-btn" data-prompt="Zkontroluj fire rating u všech zdí">
+        <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span data-i18n="ai.quickFireRating">Fire rating</span>
+      </button>
+      <button class="qa-btn" data-prompt="Najdi všechny IfcWall a zvýrazni je">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span data-i18n="ai.quickSearch">Najdi objekty</span>
+      </button>
+      <button class="qa-btn" data-prompt="Spusť validaci proti IDS specifikaci">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span data-i18n="ai.quickIdsValidation">IDS validace</span>
+      </button>
+    </div>
+
+    <div class="ai-input">
+      <button class="ai-attach" id="btnAttach" title="Připojit IDS soubor">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <div class="ai-input-wrap">
+        <textarea id="chatInput" rows="1" data-i18n-placeholder="ai.placeholder" placeholder="Zeptej se agenta na model..."></textarea>
+      </div>
+      <button class="ai-send" id="btnSend">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- EXPAND TABS -->
+<div class="expand-tab expand-tab-left" id="expandTree">
+  <svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+<div class="expand-tab expand-tab-right" id="expandAI">
+  <svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+</div>
+
+<!-- MOBILE TOGGLES -->
+<button class="mobile-toggle toggle-tree" id="mobileToggleTree">
+  <svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+</button>
+<button class="mobile-toggle toggle-ai" id="mobileToggleAI">
+  <svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.57-3.25 3.92L12 22l-.75-12.08A4.001 4.001 0 0 1 12 2z"/></svg>
+</button>
+<div class="panel-backdrop" id="panelBackdrop"></div>
+
+<!-- Hidden file input -->
+<input type="file" id="ifcFileInput" accept=".ifc" style="display:none;">
+
+<!-- APP BOOTSTRAP -->
+<script type="module" src="assets/js/core/app.js"></script>
+
+</body>
+</html>
