@@ -9,109 +9,97 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 ---
 
 ## Fáze 1: Základní kostra a 3D viewer
-**Stav: 🔄 Rozpracováno**
+**Stav: ✅ HOTOVO**
 
-### 1.1 Projekt setup ✅ HOTOVO (2026-03-16)
+### 1.1 Projekt setup ✅
 - [x] Git repo, .gitignore, CLAUDE.md, PLAN.md
-- [x] Adresářová struktura (assets/js/core, viewer, ifc, ai, ui, workers, css)
-- [x] CSS základ — variables.css (barvy z BIM_checker) + app.css (layout z mockupu)
-- [x] index.html s kompletním layoutem (navbar, icon sidebar, side panel, viewer area, AI sidebar)
+- [x] Adresářová struktura (assets/js/core, viewer, ifc, ai, ui, css)
+- [x] CSS základ — variables.css + app.css
+- [x] index.html s kompletním layoutem
 - [x] Core moduly: utils.js, state.js, i18n.js, translations.js
 - [x] UI moduly: theme.js, toast.js, modals.js, navigation.js, panels.js
-- [x] app.js bootstrap — vše propojeno
+- [x] app.js bootstrap
 
-**Poznámky:**
-- CSS proměnné v `variables.css` (ne common.css) — jiný název než v CLAUDE.md, aktualizovat
-- Port 8080 obsazen Pi Files — používáme 8090 pro dev server
-- Screenshot ověřen — layout odpovídá mockupu
+### 1.2 Integrace @thatopen/components + Three.js ✅ (opraveno 2026-03-29)
+- [x] esm.sh CDN s pinovanými deps pro konzistentní verze
+- [x] viewer-init.js — Components, Worlds, SimpleScene/Camera/Renderer
+- [x] FragmentsManager.init(workerUrl) — fragment worker inicializace
+- [x] fragments.list.onItemSet listener pro přidání modelu do scény (v3 API)
+- [x] ifc-loader.js — drag & drop + file picker
+- [x] viewer-selection.js — raycasting, zvýraznění
+- [x] viewer-tools.js — toolbar, zoom, fit-all
+- [x] Otestováno s reálnými IFC soubory na RPi
 
-### 1.2 Integrace @thatopen/components + Three.js 🔄
-- [x] Loading strategie: esm.sh CDN s dynamickými importy (fallback pokud CDN selže)
-- [x] viewer-init.js — inicializace Components, Worlds, SimpleScene/Camera/Renderer
-- [x] ifc-loader.js — drag & drop + file picker, načtení přes IfcLoader
-- [x] viewer-selection.js — raycasting (double-click), zvýraznění materiálem
-- [x] viewer-tools.js — toolbar přepínání (select/orbit/measure/clip), zoom, fit-all
-- [x] FPS counter, info bar, axes gizmo (CSS-only)
-- [ ] **TODO: Otestovat s reálným IFC souborem** — CDN import @thatopen zatím neověřen na RPi
+**Opravené problémy (2026-03-29):**
+- FragmentsManager.init() chybělo → "You need to initialize fragments first"
+- esm.sh process polyfill rozbíjel web-ifc WASM → delete process.versions.node
+- Verze mismatch CDN závislostí → ?deps= pinning
+- v3 API změna: model.object + model.useCamera() místo přímého scene.add()
 
-**Poznámky:**
-- Použit dynamický import() místo import map — robustnější pro CDN
-- Highlighting zatím přes přímou manipulaci materiálu (ne Highlighter z components-front)
-- expressID přístup závisí na geometry attributes — bude potřeba doladit po runtime testu
-
-### 1.3 UI kostra ✅ HOTOVO (2026-03-16)
+### 1.3 UI kostra ✅
 - [x] Icon sidebar s navigací (7 ikon + tooltips)
-- [x] Side panel — slide-in/out s cubic-bezier animací + expand tab
-- [x] AI sidebar — slide-in/out + expand tab
-- [x] Navbar — brand, file info, Načíst IFC/Export, průvodce, nápověda, CZ/EN, theme toggle
-- [x] Responsive (tablet <=1024px, mobil <=768px s overlay panely)
-- [x] Drop zone + drag overlay
-- [x] Light/dark theme toggle (funkční, localStorage)
+- [x] Side panel — slide-in/out s animací
+- [x] AI sidebar — slide-in/out
+- [x] Navbar, responsive layout, drop zone, theme toggle
 
 ---
 
 ## Fáze 2: IFC parsování a strom modelu
-**Stav: ✅ HOTOVO (2026-03-16)**
+**Stav: ✅ HOTOVO**
 
 ### 2.1 IFC parsování ✅
-- [x] **Rozhodnutí:** Nepoužíváme vlastní IFC stream parser — @thatopen/components IfcLoader to řeší interně
-- [x] ifc-loader.js — drag & drop + file picker, IfcLoader.load()
-- [x] ifc-index.js — po načtení projde scénu a vytvoří JSON index (typy, počty, expressIDs)
+- [x] IfcLoader z @thatopen/components (žádný vlastní parser)
+- [x] ifc-index.js — JSON index (typy, počty, expressIDs)
 
 ### 2.2 Strom modelu ✅
-- [x] tree-builder.js — hierarchie: Model → EntityType → Entity (s limitem 100 entit na typ)
-- [x] tree-ui.js — render stromu, expand/collapse, search filter (debounced), click → highlight ve 3D
-- [x] Počty v badges, barevné ikony pro IFC typy
+- [x] tree-builder.js — hierarchie Model → EntityType → Entity
+- [x] tree-ui.js — render, expand/collapse, search, click → highlight
 
 ### 2.3 Properties panel ✅
-- [x] properties-ui.js — zobrazí ExpressID, Type vybraného objektu
-- [x] Napojeno na entity-selected event
-- **TODO:** Plné PropertySety vyžadují IFC properties API — zatím jen základní info
+- [x] properties-ui.js — ExpressID, Type vybraného objektu
+- [ ] **TODO:** Plné PropertySety (vyžaduje IFC properties API)
 
 ### 2.4 IndexedDB storage ✅
-- [x] storage.js — generický wrapper (agents, endpoints, chats, settings stores)
-- [x] Oddělené stores pro agenty, endpointy, chaty, nastavení
-- **TODO:** Ukládání IFC souborů do IndexedDB (zatím se soubory jen drží v paměti)
+- [x] storage.js — generický wrapper (agents, endpoints, chats, settings)
+- [ ] **TODO:** Ukládání IFC souborů do IndexedDB
 
 ---
 
 ## Fáze 3: AI agenti
-**Stav: ✅ HOTOVO (2026-03-16)**
+**Stav: ✅ HOTOVO (vylepšeno 2026-03-29)**
 
 ### 3.1 AI client ✅
-- [x] ai-client.js — chatCompletion() s streaming (SSE), fetchModels(), testConnection()
-- [x] Podpora OpenAI-compatible API (Ollama, LM Studio, OpenAI, Anthropic, OpenRouter)
-- [x] settings-ui.js — přidání endpointů s test spojení, auto-load modelů
-- [x] Uložení do IndexedDB, status indikátor (zelená/červená tečka)
+- [x] ai-client.js — chatCompletion() s streaming, fetchModels(), testConnection()
+- [x] Podpora OpenAI-compatible API (Ollama, Google AI, OpenAI, OpenRouter)
 
-### 3.2 Agent správa ✅
+### 3.2 Provider systém ✅ (nové 2026-03-29)
+- [x] providers.js — předdefinované providery (Ollama, Google AI, OpenAI, OpenRouter, Custom)
+- [x] Auto-detekce Ollama při prvním spuštění
+- [x] detectProvider() — rozpoznání providera z URL
+- [x] Inline agent formulář s provider dropdown, auto-load modelů, temperature slider
+- [x] API klíč pole se zobrazí jen pro cloud providery
+- [x] Endpoint se vytváří automaticky na pozadí (žádný separátní krok)
+
+### 3.3 Agent správa ✅
 - [x] agent-manager.js — CRUD, IndexedDB persistence
-- [x] 4 šablony: Validátor (0.3), Hledač (0.5), Analytik (0.7), Měřič (0.3)
-- [x] Vytvoření z šablony nebo custom
-- [x] Přepínání v AI sidebar select
-- [x] settings-ui.js — seznam agentů, mazání, vytváření
+- [x] 4 šablony: Validátor, Hledač, Analytik, Měřič
+- [x] Inline editace agentů (provider, model, teplota, prompt)
+- [x] settings-ui.js — agent list + inline form (žádné prompt() dialogy)
 
-### 3.3 IFC → AI kontext ✅
-- [x] ifc-index.js — JSON index (typy, počty, expressIDs, materiály)
-- [x] getModelSummaryForAI() — textový souhrn do system promptu
-- [x] Automaticky se přidá ke každé konverzaci
+### 3.4 IFC → AI kontext ✅
+- [x] JSON index modelu → system prompt
+- [x] getModelSummaryForAI()
 
-### 3.4 Tool-calling systém ✅
-- [x] tool-defs.js — 6 nástrojů v OpenAI function-calling formátu
-- [x] tool-executor.js — executeTool() s case routing
-- [x] search_entities, get_properties, highlight_entities, clear_highlights, get_model_stats, validate_property
-- [x] Iterativní smyčka v chat-ui.js (max 5 kol)
-- **TODO:** validate_property je stub — plná implementace vyžaduje IFC properties API
+### 3.5 Tool-calling systém ✅
+- [x] 6 nástrojů v OpenAI function-calling formátu
+- [x] Iterativní smyčka (max 5 kol)
+- [ ] **TODO:** validate_property plná implementace
 
-### 3.5 Chat UI ✅
-- [x] chat-ui.js — kompletní konverzační UI (~300 řádků)
-- [x] Markdown rendering (marked.js + DOMPurify)
-- [x] Tool-calling loop s vizualizací tool calls
-- [x] Streaming odpovědí (SSE) s live preview
-- [x] Quick action tlačítka
-- [x] Klikatelné entity ID (#NNNN → navigace ve 3D)
-- [x] Thinking indikátor s tlačítkem Stop
-- **TODO:** Historie konverzací (persistence v IndexedDB)
+### 3.6 Chat UI ✅
+- [x] Kompletní konverzační UI s markdown rendering
+- [x] Streaming odpovědí (SSE), tool-call vizualizace
+- [x] Quick actions, klikatelné entity ID, thinking indikátor
+- [ ] **TODO:** Historie konverzací (persistence v IndexedDB)
 
 ---
 
@@ -126,9 +114,9 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 ### 4.2 Validační engine
 - [ ] Přenést/adaptovat validation-engine.js z BIM_checker
 - [ ] Validace IFC proti IDS: entity, property, attribute, classification, material facety
-- [ ] Web Worker pro paralelní validaci velkých souborů
+- [ ] Web Worker pro paralelní validaci
 - [ ] Výsledky validace — tabulka s pass/fail/warning
-- [ ] Zvýraznění problémových objektů ve 3D (barevné kódování)
+- [ ] Zvýraznění problémových objektů ve 3D
 - [ ] AI agent může spustit validaci přes tool-calling
 
 ---
@@ -137,27 +125,21 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 **Stav: 📋 Připraveno**
 
 ### 5.1 UX vylepšení
-- [ ] Wizard/průvodce pro první spuštění
 - [ ] Keyboard shortcuts (Escape = deselect, F = fit, etc.)
 - [ ] Export výsledků (CSV, JSON)
-- [ ] Tisk/PDF report z validace
 
 ### 5.2 Performance
 - [ ] Lazy loading PropertySetů
-- [ ] Virtualní scrolling ve stromu modelu (pro velké modely)
-- [ ] Web Worker pool pro paralelní zpracování
+- [ ] Virtuální scrolling ve stromu modelu
 - [ ] Memory management pro velké IFC soubory
 
 ### 5.3 Integrace do BIM_checker
 - [ ] Přidat jako novou stránku (pages/ai-viewer.html)
 - [ ] Sdílet common.css, i18n, storage, theme systém
-- [ ] Sdílet IFC soubory z IndexedDB storage
-- [ ] Navigace z BIM_checker hlavní stránky
 
 ### 5.4 Deployment
-- [ ] PWA manifest + service worker
+- [ ] Lokální hosting (žádný cloud deploy)
 - [ ] Testování na různých zařízeních
-- [ ] Lokální hosting (žádný cloud deploy — vše běží lokálně)
 
 ---
 
@@ -166,20 +148,12 @@ Projekt je navržen pro pozdější integraci do BIM_checker jako nová stránka
 | Datum | Rozhodnutí |
 |-------|-----------|
 | 2026-03-16 | Tech stack: vanilla JS frontend-only, žádný backend |
-| 2026-03-16 | 3D engine: @thatopen/components (MIT) + web-ifc (MPL-2.0) + Three.js (MIT) |
-| 2026-03-16 | AI: OpenAI-compatible API volaná přímo z browseru na uživatelův endpoint |
-| 2026-03-16 | AI kontext: JSON index modelu + tool-calling funkce (search, highlight, validate) |
-| 2026-03-16 | UI layout: icon sidebar + collapsible side panel + 3D viewer + collapsible AI chat |
-| 2026-03-16 | Barvy a UI vzory z BIM_checker pro budoucí integraci |
-| 2026-03-16 | Schválený mockup: viz .superpowers/brainstorm/ |
-| 2026-03-16 | Three.js verze 0.175.0 (vyžadováno @thatopen/components 3.3.2) |
-| 2026-03-16 | esm.sh CDN funguje na RPi — ověřeno (Three.js + OBC import OK) |
-| 2026-03-16 | IFC parser se NEPOUŽÍVÁ vlastní — IfcLoader z @thatopen zvládne vše |
-| 2026-03-16 | Žádný Cloudflare deploy — vše běží lokálně |
-| 2026-03-16 | Port 8080 obsazen Pi Files — dev server na portu 8090 |
-
----
-
-## Mockupy
-
-Vizuální návrhy jsou v `.superpowers/brainstorm/` — finální schválený layout: `final-bimchecker.html`
+| 2026-03-16 | 3D engine: @thatopen/components + web-ifc + Three.js |
+| 2026-03-16 | AI: OpenAI-compatible API volaná přímo z browseru |
+| 2026-03-16 | UI layout: icon sidebar + side panel + 3D viewer + AI chat |
+| 2026-03-29 | Viewer opraven: FragmentsManager.init(), process polyfill fix, deps pinning |
+| 2026-03-29 | CDN: esm.sh s ?deps= pro pinování verzí (web-ifc@0.0.74, fragments@3.3.2) |
+| 2026-03-29 | Provider systém: předdefinovaní provideři jako v local-ai-playground |
+| 2026-03-29 | Agent UI: inline formulář v panelu, žádné prompt() dialogy |
+| 2026-03-29 | API klíče: uložené v IndexedDB prohlížeče, nikdy v souborech |
+| 2026-03-29 | Dev server: port 8088 (8080 obsazen Pi Files) |

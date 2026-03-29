@@ -159,8 +159,62 @@
 
     <!-- Panel: Agents -->
     <div class="panel-view hidden" id="panel-agents">
-      <div class="settings-section" id="agentsList">
-        <div style="color:var(--text-tertiary);font-size:12px;" data-i18n="agents.noAgents">Žádní agenti — vytvořte prvního</div>
+      <div class="settings-section" id="agentsList"></div>
+
+      <!-- Agent edit/create form (hidden by default) -->
+      <div class="settings-form hidden" id="agentForm">
+        <input type="hidden" id="agentFormId">
+        <div class="form-group">
+          <label class="form-label">Název</label>
+          <input type="text" id="agentName" class="input-modern" placeholder="Název agenta">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Šablona</label>
+          <select id="agentTemplate" class="input-modern">
+            <option value="">— vlastní —</option>
+            <option value="validator">Validátor</option>
+            <option value="searcher">Hledač objektů</option>
+            <option value="analyst">Analytik</option>
+            <option value="measurer">Měřič</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Provider</label>
+          <select id="agentProvider" class="input-modern">
+            <option value="ollama">Ollama (localhost)</option>
+            <option value="google">Google AI (Gemini)</option>
+            <option value="openai">OpenAI</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="agentEndpointGroup">
+          <label class="form-label">Endpoint URL</label>
+          <input type="text" id="agentEndpoint" class="input-modern" placeholder="http://localhost:11434/v1">
+        </div>
+        <div class="form-group hidden" id="agentApiKeyGroup">
+          <label class="form-label">API klíč</label>
+          <input type="password" id="agentApiKey" class="input-modern" placeholder="sk-...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Model</label>
+          <select id="agentModel" class="input-modern">
+            <option value="">Vyberte provider...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teplota: <span id="tempValue">0.70</span></label>
+          <input type="range" id="agentTemp" min="0" max="150" step="5" value="70" style="width:100%;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">System prompt</label>
+          <textarea id="agentPrompt" class="input-modern" rows="4" placeholder="Instrukce pro agenta..."></textarea>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-modern" id="agentSaveBtn" style="flex:1;">Uložit</button>
+          <button class="btn-modern" id="agentCancelBtn" style="flex:1;background:var(--bg-tertiary);">Zrušit</button>
+        </div>
+        <button class="btn-modern hidden" id="agentDeleteBtn" style="width:100%;margin-top:4px;background:var(--error);color:#fff;">Smazat agenta</button>
       </div>
     </div>
 
@@ -169,18 +223,16 @@
       <div style="padding:16px;color:var(--text-tertiary);font-size:12px;">IDS specifikace — připravuje se.</div>
     </div>
 
-    <!-- Panel: Settings -->
+    <!-- Panel: Settings (minimal — general app settings) -->
     <div class="panel-view hidden" id="panel-settings">
-      <div class="settings-section" id="endpointsList">
+      <div class="settings-section">
         <h4>
           <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span data-i18n="settings.endpoints">LLM Endpointy</span>
+          <span data-i18n="nav.settings">Nastavení</span>
         </h4>
-        <div id="endpointsContainer"></div>
-        <button class="btn-modern" id="btnAddEndpoint" style="margin-top:8px;width:100%;">
-          <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span data-i18n="settings.addEndpoint">Přidat endpoint</span>
-        </button>
+        <div style="color:var(--text-tertiary);font-size:12px;padding:4px 0;">
+          LLM spojení se nastavuje přímo u každého agenta.
+        </div>
       </div>
     </div>
   </div>

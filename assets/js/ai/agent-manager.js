@@ -60,6 +60,32 @@ export async function loadAgents() {
 
 export async function loadEndpoints() {
   state.endpoints = await storage.endpoints.getAll();
+
+  // Auto-detect Ollama on first run
+  if (state.endpoints.length === 0) {
+    try {
+      const { testConnection } = await import('../ai/ai-client.js');
+      const { PROVIDERS } = await import('../ai/providers.js');
+      const ollama = PROVIDERS.ollama;
+      const test = await testConnection(ollama.endpoint, '');
+      if (test.ok) {
+        const ep = await saveEndpoint({
+          name: ollama.name,
+          url: ollama.endpoint,
+          apiKey: '',
+          models: test.models,
+        });
+        console.log(`Ollama auto-detected: ${test.models.length} models`);
+
+        // Auto-create default agent
+        if (test.models.length > 0) {
+          await createFromTemplate('searcher', ep.id, test.models[0]);
+          state.agents = await storage.agents.getAll();
+        }
+      }
+    } catch { /* Ollama not available, that's fine */ }
+  }
+
   return state.endpoints;
 }
 

@@ -3,3 +3,7 @@ node_modules/
 *.log
 .env
 .superpowers/
+.claude/
+test-*.html
+test-*.ifc
+docs/

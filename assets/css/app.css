@@ -3,6 +3,9 @@
    Ported from approved mockup (final-bimchecker.html)
    ========================================================================== */
 
+/* Global utility */
+.hidden { display: none !important; }
+
 /* ===== RESET & BASE ===== */
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { width:100%; height:100%; overflow:hidden; }
@@ -125,7 +128,7 @@ svg.icon-lg { width:20px; height:20px; }
 
 /* Panel views — only one visible at a time */
 .panel-view { display:flex; flex-direction:column; flex:1; overflow:hidden; }
-.panel-view.hidden { display:none; }
+.panel-view.hidden { display:none; } /* kept for specificity */
 
 /* Search */
 .search-wrap { position:relative; margin:8px 10px; }
@@ -501,6 +504,25 @@ svg.icon-lg { width:20px; height:20px; }
 .endpoint-card .ep-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
 .endpoint-card .ep-name { font-size:12px; font-weight:600; color:var(--text-primary); flex:1; }
 .endpoint-card .ep-url { font-size:10px; color:var(--text-tertiary); word-break:break-all; }
+.settings-form {
+  display:flex; flex-direction:column; gap:6px; margin-top:8px;
+  padding:10px; background:var(--bg-primary); border:1px solid var(--border-primary);
+  border-radius:var(--radius-md);
+}
+.settings-form .form-group { margin-bottom:8px; }
+.settings-form .form-label { display:block; font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:3px; text-transform:uppercase; letter-spacing:0.5px; }
+.settings-form select.input-modern,
+.settings-form input.input-modern,
+.settings-form textarea.input-modern {
+  width:100%; padding:6px 8px; font-size:12px;
+  background:var(--bg-secondary); color:var(--text-primary);
+  border:1px solid var(--border-primary); border-radius:var(--radius-sm);
+  outline:none;
+}
+.settings-form select.input-modern:focus,
+.settings-form input.input-modern:focus {
+  border-color:var(--primary);
+}
 .agent-card {
   padding:10px; background:var(--bg-primary); border:1px solid var(--border-primary);
   border-radius:var(--radius-md); margin-bottom:8px; cursor:pointer; transition:all var(--transition-fast);

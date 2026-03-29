@@ -72,13 +72,9 @@ export async function loadIfcFile(file) {
     const ifcLoader = getComponents().get(OBC.IfcLoader);
     const modelId = file.name.replace(/\.ifc$/i, '');
 
-    const model = await ifcLoader.load(buffer, false, modelId);
-
-    // Add model to scene
-    const world = (await import('../viewer/viewer-init.js')).getWorld();
-    if (model && world?.scene?.three) {
-      world.scene.three.add(model);
-    }
+    // v3 API: model is added to scene via fragments.list.onItemSet
+    // listener registered in viewer-init.js
+    await ifcLoader.load(buffer, false, modelId);
 
     state.currentModelId = modelId;
 
